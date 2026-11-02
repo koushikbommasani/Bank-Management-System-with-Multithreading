@@ -1,0 +1,7 @@
+# Compiled Java files
+*.class
+out/
+
+# Files created when the program runs
+accounts.dat
+report.html

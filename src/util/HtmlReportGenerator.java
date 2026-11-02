@@ -23,6 +23,7 @@ public class HtmlReportGenerator {
             throws IOException {
         ArrayList<String> lines = new ArrayList<String>();
         addPageStart(lines);
+        addSummary(lines, accounts);
         addAccountsTable(lines, accounts);
         addStatementTable(lines, statementAccount);
         addPageEnd(lines);
@@ -62,6 +63,8 @@ public class HtmlReportGenerator {
         lines.add("<style>");
         // Use a simple font for the whole page and leave space around the edges
         lines.add("body { font-family: Arial, sans-serif; margin: 20px; }");
+        // Dark blue colour for the headings
+        lines.add("h1, h2 { color: navy; }");
         // Join cell borders into single lines and leave space below each table
         lines.add("table { border-collapse: collapse; margin-bottom: 30px; }");
         // Give every header cell and data cell a thin dark border and some inner space
@@ -76,8 +79,42 @@ public class HtmlReportGenerator {
         lines.add("</style>");
     }
 
+    // Adds a short summary as a bullet list: number of accounts and total money in the bank
+    private static void addSummary(ArrayList<String> lines, Collection<Account> accounts) {
+        int savingsCount = 0;
+        int currentCount = 0;
+        double totalMoney = 0;
+        for (Account account : accounts) {
+            if (account.getAccountType().equals("Savings")) {
+                savingsCount++;
+            } else {
+                currentCount++;
+            }
+            totalMoney = totalMoney + account.getBalance();
+        }
+
+        // A horizontal line to separate this section from the heading above
+        lines.add("<hr>");
+        // Smaller heading for the summary section
+        lines.add("<h2>Summary</h2>");
+        // Start of a bullet list (ul = unordered list)
+        lines.add("<ul>");
+        // One bullet point (li = list item); <b> makes the number bold
+        lines.add("<li>Total accounts: <b>" + accounts.size() + "</b></li>");
+        // Bullet point with the number of savings accounts
+        lines.add("<li>Savings accounts: <b>" + savingsCount + "</b></li>");
+        // Bullet point with the number of current accounts
+        lines.add("<li>Current accounts: <b>" + currentCount + "</b></li>");
+        // Bullet point with the total money held in all accounts
+        lines.add("<li>Total money in the bank: <b>Rs. " + String.format("%.2f", totalMoney) + "</b></li>");
+        // End of the bullet list
+        lines.add("</ul>");
+    }
+
     // Adds the table that lists all accounts
     private static void addAccountsTable(ArrayList<String> lines, Collection<Account> accounts) {
+        // A horizontal line to separate this section from the one above
+        lines.add("<hr>");
         // Smaller heading above the table
         lines.add("<h2>All Accounts</h2>");
         // Start of the table
@@ -100,6 +137,8 @@ public class HtmlReportGenerator {
 
     // Adds the statement (transaction list) of one account
     private static void addStatementTable(ArrayList<String> lines, Account account) {
+        // A horizontal line to separate this section from the one above
+        lines.add("<hr>");
         if (account == null) {
             // A paragraph saying no statement was chosen
             lines.add("<p>No account selected for the statement.</p>");
@@ -142,6 +181,10 @@ public class HtmlReportGenerator {
 
     // Adds the closing tags of the page
     private static void addPageEnd(ArrayList<String> lines) {
+        // A horizontal line above the footer
+        lines.add("<hr>");
+        // Footer text in italics (<i>) at the bottom of the page
+        lines.add("<p><i>Report created by the Bank Management System (Java console project).</i></p>");
         // End of the visible part of the page
         lines.add("</body>");
         // End of the whole page
